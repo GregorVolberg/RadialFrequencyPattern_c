@@ -23,11 +23,13 @@ MonitorSelection = 3;
 MonitorSpecs = getMonitorSpecs(MonitorSelection); % subfunction, gets specification for monitor
 
 %% sound generation 
+InitializePsychSound;
+status = PsychPortAudio('GetStatus', pahandle);
+pahandle = PsychPortAudio('Open');
 fade       = 0.02; %fade-in, fade-out
 %Freq       = 2200; %in Hz, über conmat!
 duration   = 0.8;
-%betw_pause = 0.4;
-Fs         = 44000; % sampling freq
+Fs         = status.SampleRate; % sampling freq
 
 %% RFP
 penwidth = 2;
@@ -61,7 +63,7 @@ bigconmat = Shuffle(bigconmat,2); % randomize trial order
 % col6: audio frequency, [2000 2200 2400]
 
 ISI = [0.8 1.2];
-pahandle = PsychPortAudio('Open');
+
 
 try
     Priority(1);
@@ -99,7 +101,7 @@ try
         for trial = 1:size(conmat, 1)
         
         % prepare stimuli
-        snd = get_sound(conmat(trial,3), duration, conmat(trial, 6), fade, Fs);
+        snd = make_soundRFPc(duration, conmat(trial, 6), fade, Fs, conmat(trial,3));
         PsychPortAudio('DeleteBuffer'); % clear
         PsychPortAudio('FillBuffer', pahandle, snd);
         
