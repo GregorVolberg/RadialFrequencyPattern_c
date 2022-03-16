@@ -16,6 +16,7 @@ for k = 1:nodd
 twav(k, :) = sign(mod(k, 2) - 0.5)/k * (sin(2*pi*k*Freq*t));
 end
 snd = sum(twav, 1);
-snd = snd * (max(sinwav)/max(snd)); % re-scale
+snd = snd * (max(twav(1,:))/max(snd)); % re-scale
 snd = snd .* fadefunc';
+snd = repmat(snd,2,1);
 end
