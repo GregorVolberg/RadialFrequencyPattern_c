@@ -147,7 +147,7 @@ try
     
     
     if run_mode == 1
-    save([rawdir, outfilename], 'RFP');
+    save([rawdir, outfilename], 'RFP', '-v7');
     escpress = show_instruction(win, instTexture, run_mode, blocknum);
     else
         escpress = 1;
