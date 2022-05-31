@@ -14,8 +14,7 @@ tmp = rbind(tmp, tmp2)
 ds = as_tibble(tmp) %>%
      mutate(vp       = as_factor(df.RFP..1..),
             mapping  = fct_recode(as_factor(df.RFP..2..), rund_links = '1', rund_rechts = '2'),
-            date     = as.POSIXct(df.RFP..3.., format='%Y%m%dT%H%M%S'),
-            waveform = fct_recode(as_factor(X5), sine = '1', tria = '2'),) %>%
+            date     = as.POSIXct(df.RFP..3.., format='%Y%m%dT%H%M%S')) %>%
      rename(trial       = X1,
             block       = X2,
             origTrial   = X3,
@@ -30,8 +29,16 @@ ds = as_tibble(tmp) %>%
             ISI         = X12,
             size        = X13) %>%
     select(vp, block, trial, rt, isRound, rfpbase,
-           rfpfreq, nodd, waveform, audiofreq , size,
+           rfpfreq, nodd, audiofreq , size,
            origTrial, mapping, date)
 
-fname = 'RFP_rawData.rds'
+ds = ds %>%
+     filter(!vp %in% c('S02', 'S10')) # exclude bad data 
+
+# S19 had one additional block, remove block 13
+ds[ds$vp=='S19',]$block = rep(1:13, each = 48) 
+ds  = ds %>% filter(block < 13) 
+
+
+fname = 'RFPc_rawData.rds'
 saveRDS(ds, file = fname)

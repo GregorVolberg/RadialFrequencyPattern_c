@@ -3,9 +3,14 @@ library(R.matlab)
 
 fpath   = './'
 PngPath = './png/'
-fname = 'RFP_rawData.rds'
-ds = readRDS(file = paste(fpath, fname, sep = ''))
-    
+fname = 'RFPc_rawData.rds'
+ds = readRDS(file = paste(fpath, fname, sep = '')) %>%
+     filter(!vp %in% c('S02', 'S10')) # exclude bad data 
+
+# S19 had one additional block, remove block 13
+ds[ds$vp=='S19',]$block = rep(1:13, each = 48) 
+ds  = ds %>% filter(block < 13) 
+
 
 # sanity check
 n = n_distinct(ds$vp)
@@ -19,14 +24,14 @@ trialsPerPerson = ds %>%
 vpnames = unique(ds$vp)
 
 # get fraction 'spiky' responses  
-prz1all = ds %>% group_by(vp, nodd, waveform) %>%
+prz1all = ds %>% group_by(vp, nodd, rfpbase) %>%
       summarize(f_spikey = mean(isRound == 0)) %>%
-      filter(waveform == '0.5') %>% 
+      filter(rfpbase == '0.5') %>% 
       ungroup()
 
-prz2all = ds %>% group_by(vp, nodd, waveform) %>%
+prz2all = ds %>% group_by(vp, nodd, rfpbase) %>%
        summarize(f_spikey = mean(isRound == 0)) %>%
-       filter(waveform == '1.5') %>% 
+       filter(rfpbase == '1.5') %>% 
        ungroup()
 
 for (k in 1:length(vpnames)){
